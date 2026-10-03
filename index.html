@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AutómataLab: AFD y AFND interactivos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="glass"><b>AutómataLab</b><div><a href="#teoria">Teoría</a><a href="#sim">Simulador</a><a href="#arena">Arena</a><a href="#rank">Ranking</a><button class="btn" id="theme" aria-label="Cambiar tema">Claro / oscuro</button><span class="user" id="who"></span></div></nav>
+<dialog id="auth"><form id="a-form"><h2 id="a-title"></h2>
+<label id="a-user">Usuario público (aparece en el ranking)<input class="fld" id="a-name" maxlength="20" autocomplete="username"></label>
+<label>Correo<input class="fld" id="a-email" type="email" required autocomplete="email"></label>
+<label>Contraseña (mínimo 6)<input class="fld" id="a-pass" type="password" required minlength="6" autocomplete="current-password"></label>
+<p class="bad" id="a-msg" style="font-size:14px;min-height:22px;margin-top:10px"></p>
+<div class="row"><button class="btn pri" id="a-go">Entrar</button><button type="button" class="btn" id="a-sw"></button><button type="button" class="btn" id="a-x">Cerrar</button></div></form></dialog>
+<main class="wrap">
+<header class="hero">
+  <h1>Mira cómo una máquina lee una cadena.</h1>
+  <p>Un laboratorio para estudiar autómatas finitos deterministas y no deterministas: define, simula paso a paso y compara qué cambia cuando el autómata puede elegir varios caminos a la vez.</p>
+  <a class="btn pri" href="#sim">Abrir simulador</a><a class="btn" href="#teoria">Leer la teoría</a>
+</header>
+
+<section id="teoria">
+  <h2>Fundamentos formales</h2>
+  <p class="mut">Ambos modelos comparten la quíntupla; cambia el tipo de la función de transición.</p>
+  <div class="g2">
+    <article class="glass card">
+      <h3>AFD: autómata finito determinista</h3>
+      <div class="f">M = (Q, Σ, δ, q₀, F)<br>δ : Q × Σ → Q</div>
+      <ul><li>Q: conjunto finito de estados; Σ: alfabeto finito.</li><li>δ es total: cada par (estado, símbolo) tiene exactamente un destino.</li><li>q₀ ∈ Q es el estado inicial y F ⊆ Q los estados de aceptación.</li></ul>
+      <div class="f">δ̂(q, ε) = q<br>δ̂(q, wa) = δ(δ̂(q, w), a)<br>L(M) = { w ∈ Σ* | δ̂(q₀, w) ∈ F }</div>
+    </article>
+    <article class="glass card">
+      <h3>AFND: autómata finito no determinista</h3>
+      <div class="f">N = (Q, Σ, δ, q₀, F)<br>δ : Q × Σ → 𝒫(Q)</div>
+      <ul><li>δ devuelve un conjunto: puede ser vacío (rama muerta) o tener varios estados (bifurcación).</li><li>La máquina explora todas las ramas en paralelo.</li><li>Acepta si al menos una rama termina en un estado de F.</li></ul>
+      <div class="f">δ̂(q, ε) = {q}<br>δ̂(q, wa) = ⋃ δ(p, a), p ∈ δ̂(q, w)<br>L(N) = { w | δ̂(q₀, w) ∩ F ≠ ∅ }</div>
+    </article>
+  </div>
+  <div class="glass thm"><b>Teorema de Rabin–Scott (1959).</b> <span class="mut">Todo AFND con n estados es equivalente a un AFD con a lo sumo 2ⁿ estados (construcción de subconjuntos). Ambos reconocen exactamente los lenguajes regulares; el AFND puede ser exponencialmente más compacto.</span></div>
+</section>
+
+<section id="sim">
+  <h2>Simulador paso a paso</h2>
+  <p class="mut">Ambos autómatas reconocen el lenguaje «cadenas sobre {0,1} que terminan en 01». Prueba la misma cadena en los dos modos.</p>
+  <div class="sim">
+    <div class="glass card">
+      <div class="seg" role="tablist"><button id="m-afd" class="on">AFD</button><button id="m-afnd">AFND</button></div>
+      <p class="mut" id="note" style="margin-top:10px;font-size:14px"></p>
+      <svg id="svg" viewBox="0 0 540 260" role="img" aria-label="Diagrama del autómata"></svg>
+      <div class="row"><input type="text" id="in" value="1101" placeholder="Cadena en {0,1}" aria-label="Cadena de entrada" maxlength="24" autocomplete="off">
+        <button class="btn" id="step">Paso</button><button class="btn pri" id="run">Ejecutar</button><button class="btn" id="rst">Reiniciar</button></div>
+      <p class="bad" id="err" hidden style="font-size:14px">Solo se admiten los símbolos 0 y 1.</p>
+      <div class="row"><span class="mut" style="font-size:14px">Velocidad</span><input type="range" id="spd" min="1" max="5" value="3" aria-label="Velocidad"></div>
+      <div class="tape" id="tape" aria-live="polite"></div>
+      <div class="mono mut" id="cur" style="font-size:14px;margin-top:6px"></div>
+      <div class="res" id="res" role="status"></div>
+    </div>
+    <div class="side">
+      <div class="glass"><h3>Función de transición δ</h3><table id="delta"></table></div>
+      <div class="glass"><h3>Traza de ejecución</h3><ol id="log"></ol></div>
+      <div class="glass"><h3>Simulaciones guardadas</h3>
+        <button class="btn" id="save" disabled>Guardar simulación</button>
+        <ul class="l" id="saved" style="margin-top:10px;font-size:14px"></ul>
+        <p class="mut mono" id="store" style="font-size:12px;margin-top:8px"></p></div>
+    </div>
+  </div>
+</section>
+<section id="arena">
+<h2>Arena: diseña el autómata</h2>
+<p class="mut">Cada reto describe un lenguaje sobre {0,1}. Rellena la tabla de transiciones; tu autómata se evalúa contra las 127 cadenas de longitud ≤ 6 y verás los contraejemplos.</p>
+<div class="gate"><div class="gate-in">
+<div class="exs" id="exs"></div>
+<div class="glass card">
+<p id="prompt"></p>
+<div class="row"><div class="seg"><button id="r-afd" class="on">AFD</button><button id="r-afnd">AFND</button></div>
+<label class="mut" style="font-size:14px">Estados <select class="fld" id="nst" style="width:auto"></select></label></div>
+<table id="bt"></table><p class="mut" id="hint" style="font-size:13px;margin-top:8px"></p>
+<div class="row"><button class="btn pri" id="go">Evaluar mi autómata</button><button class="btn" id="conv" hidden>Convertir a AFD</button></div>
+<div class="bar"><i id="abar"></i></div><div id="aout" aria-live="polite"></div>
+</div></div><div class="lock"><div class="glass card"><h3>Zona de competencia</h3><p class="mut" style="margin:6px 0 14px">Entra con tu cuenta del curso para resolver retos y aparecer en el ranking.</p><button class="btn pri open-auth">Ingresar o crear cuenta</button></div></div></div></section>
+<section id="rank">
+<h2>Ranking del curso</h2>
+<p class="mut">Suma de tu mejor puntaje por reto. Cada reto vale hasta 120: 100 por exactitud y 20 por usar el mínimo de estados.</p>
+<div class="gate"><div class="gate-in glass card"><table class="rk"><thead><tr><th>#</th><th>Estudiante</th><th>Puntos</th><th>Retos</th><th>Rango</th></tr></thead><tbody id="rk"></tbody></table></div><div class="lock"><div class="glass card"><h3>Zona de competencia</h3><p class="mut" style="margin:6px 0 14px">Entra con tu cuenta del curso para resolver retos y aparecer en el ranking.</p><button class="btn pri open-auth">Ingresar o crear cuenta</button></div></div></div></section></main>
+<footer>AutómataLab. Matemáticas discretas y teoría de la computación.</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/sim.js"></script>
+<script src="js/arena.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>
