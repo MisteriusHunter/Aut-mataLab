@@ -2,10 +2,6 @@
 
 Simulador de AFD/AFND + Arena de retos con ranking del curso. Sitio estático (sin build) con Supabase como backend.
 
-## Autor
-
-- Andres Felipe Grimaldos Garcia
-
 ## Estructura
 - `index.html`: marcado semántico (teoría, simulador, arena, ranking, diálogo de login).
 - `css/styles.css`: tokens de tema (oscuro/claro), glassmorphism y animaciones.
@@ -19,5 +15,5 @@ Simulador de AFD/AFND + Arena de retos con ranking del curso. Sitio estático (s
 ## Puesta en marcha
 1. Crea un proyecto en Supabase y ejecuta `schema.sql` en el SQL Editor.
 2. Authentication → Providers → Email: desactiva "Confirm email" (más simple para el salón).
-3. Pega la URL y la anon key en `js/config.js`.
+3. La URL y la anon key ya están en `js/config.js`; cámbialas solo si usas otro proyecto.
 4. Abre `index.html` (mejor con un servidor local) o sube la carpeta a GitHub y conéctala a Vercel, Netlify o GitHub Pages.

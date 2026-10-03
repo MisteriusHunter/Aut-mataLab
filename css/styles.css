@@ -60,7 +60,6 @@ ol,ul.l{list-style:none;padding:0}#log li{font:13px var(--mono);padding:6px 0;bo
 .ok{color:var(--ok)}.bad{color:var(--bad)}
 .side{display:flex;flex-direction:column;gap:20px}.side .glass{padding:20px}.side h3{font-size:1rem;margin-bottom:8px}
 input[type=range]{accent-color:var(--ac)}
-footer{padding:40px 0;text-align:center;color:var(--mut);font-size:14px}
 @media(max-width:860px){.g2,.sim{grid-template-columns:1fr}nav div a{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
 
@@ -86,3 +85,5 @@ body:not(.auth) .gate-in{filter:blur(7px);opacity:.55;user-select:none}
 .fails li{font:13px var(--mono);margin:4px 0;color:var(--bad)}
 .rk td,.rk th{text-align:left}.rk td:first-child{font-weight:700}
 .rk tr.me{background:rgba(139,123,255,.16)}.rk tr.top td:first-child{color:#f5c542}
+
+dialog .row{justify-content:center;margin:12px 0 0}
